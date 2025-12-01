@@ -19,7 +19,7 @@ class BaseAction:
         """
         self.client = client
     
-    def _post(self, endpoint: str, json_data: dict[str, Any], name: str | None = None) -> dict[str, object] | list[dict[str, object]]:
+    def _post(self, endpoint: str, json_data: dict[str, Any], name: str | None = None, headers: dict[str, str] | None = None) -> dict[str, object] | list[dict[str, object]]:
         """
         发送POST请求的通用方法
         
@@ -27,6 +27,7 @@ class BaseAction:
             endpoint: API端点路径
             json_data: 请求体JSON数据
             name: Locust统计中的名称（如果为None，使用endpoint）
+            headers: 请求头（可选，用于认证等）
             
         Returns:
             响应JSON数据
@@ -34,7 +35,8 @@ class BaseAction:
         response = self.client.post(
             endpoint,
             json=json_data,
-            name=name or endpoint
+            name=name or endpoint,
+            headers=headers
         )
         if response.status_code == 200:
             return response.json()

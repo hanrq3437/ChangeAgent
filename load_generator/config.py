@@ -101,6 +101,10 @@ DEFAULT_USERS = [
     # 可以添加更多测试用户
 ]
 
+# 管理员账号（用于注册等需要管理员权限的操作）
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "222222")
+
 # 请求超时时间（秒）
 REQUEST_TIMEOUT = 30
 

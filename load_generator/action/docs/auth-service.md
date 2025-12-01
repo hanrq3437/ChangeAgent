@@ -12,13 +12,90 @@
 
 ## 用户注册
 
-创建新用户账户。**该功能经测试，无法使用。**
+创建新的用户账户。
 
 ### API信息
-- **Endpoint**: `/api/v1/auth` (ts-auth-service)
+- **Endpoint**: `/api/v1/adminuserservice/users` (ts-admin-user-service)
 - **Method**: `POST`
-- **Description**: 创建用户账户（由ts-user-service调用，创建默认角色用户）
-- **认证**: 不需要
+- **Description**: 创建用户账户
+- **认证**: 需要，需要在header中带上token，比如`{"Authorization": f"Bearer {token}"}`
+
+### 请求参数
+
+```json
+{
+  "userName": "string",
+  "password": "string",
+  "gender": "integer",
+  "documentType": "integer",
+  "documentNum": "string",
+  "email": "string"
+}
+```
+
+参数说明：
+- `userName` (string, 必填): 用户名
+- `password` (string, 必填): 密码
+- `gender` (integer, 必填): 性别，1表示男性，0表示女性
+- `documentType` (integer, 必填): 证件类型，1表示身份证
+- `documentNum` (string, 必填): 证件号码，通常为18位身份证号
+- `email` (string, 必填): 邮箱地址
+
+### 响应格式
+
+成功响应：
+```json
+{
+  "status": 1,
+  "msg": "REGISTER USER SUCCESS",
+  "data": {
+    "userId": "string",
+    "userName": "string",
+    "password": "string",
+    "gender": 1,
+    "documentType": 1,
+    "documentNum": "string",
+    "email": "string"
+  }
+}
+```
+
+失败响应：
+```json
+{
+  "status": 0,
+  "msg": "Error message",
+  "data": null
+}
+```
+
+### Action方法
+
+**方法名**: `register()`
+
+**入参**:
+- `user_name` (str): 用户名
+- `password` (str): 密码
+- `gender` (int): 性别，1表示男性，0表示女性
+- `document_type` (int): 证件类型，1表示身份证
+- `document_num` (str): 证件号码
+- `email` (str): 邮箱地址
+- `token` (str): 认证token（需要先通过login方法获取）
+
+**返回值**:
+- `dict[str, object]`: 注册响应数据
+  - 成功时返回: `{"status": 1, "msg": "REGISTER USER SUCCESS", "data": {"userId": "...", "userName": "...", ...}}`
+  - 失败时返回: `{"status": 0, "msg": "Error message", "data": null}` 或空字典 `{}`
+
+### 注意事项
+
+- 注册接口需要先登录获取token，然后在请求头中添加：`Authorization: Bearer {token}`
+- 证件号码通常为18位身份证号
+- 性别字段：1表示男性，0表示女性
+- 证件类型：1表示身份证
+- 注册成功后，返回的数据中包含生成的 `userId`，可用于后续操作
+
+
 
 ---
 

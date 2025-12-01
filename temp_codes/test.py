@@ -120,16 +120,20 @@ def test_get_with_auth():
         print("❌ 登录失败，无法获取token")
         return
     
-    endpoint = "/api/v1/auth"
+    endpoint = "/api/v1/adminuserservice/users"
     url = f"{BASE_URL}{endpoint}"
-    # headers = {"Authorization": f"Bearer {token}"}
+    headers = {"Authorization": f"Bearer {token}"}
 
     data = {
+        "documentType": "1",
+        "documentNum": "123456789012345678",
+        "email": "test@test.com",
+        "gender": "1",
         "userName": "test",
         "password": "111111"
     }
     print(f"\nPOST {url} (with token)")
-    response = requests.post(url, json=data)
+    response = requests.post(url, json=data, headers=headers)
     print_response(response)
 
 # ============================================================================

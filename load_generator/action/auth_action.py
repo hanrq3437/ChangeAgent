@@ -40,6 +40,42 @@ class AuthAction(BaseAction):
                         return str(token)
         return ""
     
+    def register(self, user_name: str, password: str, gender: int, document_type: int, document_num: str, email: str, token: str) -> dict[str, object]:
+        """
+        用户注册
+        
+        Args:
+            user_name: 用户名
+            password: 密码
+            gender: 性别，1表示男性，0表示女性
+            document_type: 证件类型，1表示身份证
+            document_num: 证件号码，通常为18位身份证号
+            email: 邮箱地址
+            token: 认证token（需要先登录获取）
+            
+        Returns:
+            注册响应数据，如果失败则返回空字典或错误信息
+            格式: {"status": 1, "msg": "REGISTER USER SUCCESS", "data": {...}}
+            失败时: {"status": 0, "msg": "Error message", "data": null} 或 {}
+        """
+        data = {
+            "userName": user_name,
+            "password": password,
+            "gender": gender,
+            "documentType": document_type,
+            "documentNum": document_num,
+            "email": email
+        }
+        
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        result = self._post("/api/v1/adminuserservice/users", data, headers=headers)
+        # 注册接口返回格式: {"status": 1, "msg": "REGISTER USER SUCCESS", "data": {"userId": "...", "userName": "...", ...}}
+        if isinstance(result, dict):
+            return result
+        return {}
+    
+    
     def get_all_users(self) -> list[dict[str, object]]:
         """
         获取所有用户
