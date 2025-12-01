@@ -120,21 +120,53 @@ def test_get_with_auth():
         print("❌ 登录失败，无法获取token")
         return
     
-    endpoint = "/api/v1/adminuserservice/users"
-    url = f"{BASE_URL}{endpoint}"
-    headers = {"Authorization": f"Bearer {token}"}
+    # # 第二步：注册用户
+    # endpoint = "/api/v1/adminuserservice/users"
+    # url = f"{BASE_URL}{endpoint}"
+    # headers = {"Authorization": f"Bearer {token}"}
 
-    data = {
-        "documentType": "1",
-        "documentNum": "123456789012345678",
-        "email": "test@test.com",
-        "gender": "1",
-        "userName": "test",
-        "password": "111111"
-    }
-    print(f"\nPOST {url} (with token)")
-    response = requests.post(url, json=data, headers=headers)
+    # data = {
+    #     "documentType": "1",
+    #     "documentNum": "123456789012345678",
+    #     "email": "test@test.com",
+    #     "gender": "1",
+    #     "userName": "test",
+    #     "password": "111111"
+    # }
+    # print(f"\nPOST {url} (注册用户)")
+    # print(f"Data: {json.dumps(data, indent=2, ensure_ascii=False)}")
+    # response = requests.post(url, json=data, headers=headers)
+    # print_response(response)
+    
+    # # 从注册响应中提取userId
+    # user_id = None
+    # if response.status_code == 200:
+    #     try:
+    #         result = response.json()
+    #         if result.get("status") == 1:
+    #             user_id = result.get("data", {}).get("userId")
+    #             if user_id:
+    #                 print(f"\n✅ 注册成功，用户ID: {user_id}")
+    #     except:
+    #         pass
+    
+    # if not user_id:
+    #     print("❌ 注册失败，无法获取用户ID，跳过删除操作")
+    #     return
+    
+    user_id = "ed5c5491-c4e1-431d-bc14-cff9e04c9d75"
+    # 第三步：删除用户
+    endpoint = f"/api/v1/adminuserservice/users/{user_id}"
+    url = f"{BASE_URL}{endpoint}"
+    print(f"\nDELETE {url} (删除用户)")
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.delete(url, headers=headers)
     print_response(response)
+    
+    if response.status_code == 200:
+        print("\n✅ 删除用户成功")
+    else:
+        print(f"\n❌ 删除用户失败，状态码: {response.status_code}")
 
 # ============================================================================
 # 在这里修改要测试的接口

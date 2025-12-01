@@ -91,4 +91,25 @@ class AuthAction(BaseAction):
         if isinstance(response_json, list):
             return response_json
         return []
+    
+    def delete_user(self, user_id: str, token: str) -> dict[str, object]:
+        """
+        删除用户
+        
+        Args:
+            user_id: 用户ID（UUID格式），不是用户名
+            token: 认证token（需要先登录获取）
+            
+        Returns:
+            删除响应数据，如果失败则返回空字典或错误信息
+            格式: {"status": 1, "msg": "DELETE SUCCESS", "data": null}
+            失败时: {"status": 0, "msg": "Error message", "data": null} 或 {}
+        """
+        headers = {"Authorization": f"Bearer {token}"}
+        
+        result = self._delete(f"/api/v1/adminuserservice/users/{user_id}", headers=headers)
+        # 删除接口返回格式: {"status": 1, "msg": "DELETE SUCCESS", "data": null}
+        if isinstance(result, dict):
+            return result
+        return {}
 

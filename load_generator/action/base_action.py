@@ -109,20 +109,22 @@ class BaseAction:
             except:
                 return {"status_code": response.status_code, "message": response.text, "status": 0}
     
-    def _delete(self, endpoint: str, name: str | None = None) -> dict[str, object]:
+    def _delete(self, endpoint: str, name: str | None = None, headers: dict[str, str] | None = None) -> dict[str, object]:
         """
         发送DELETE请求的通用方法
         
         Args:
             endpoint: API端点路径
             name: Locust统计中的名称（如果为None，使用endpoint）
+            headers: 请求头（可选，用于认证等）
             
         Returns:
             响应JSON数据
         """
         response = self.client.delete(
             endpoint,
-            name=name or endpoint
+            name=name or endpoint,
+            headers=headers
         )
         
         if response.status_code == 200:

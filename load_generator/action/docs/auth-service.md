@@ -7,6 +7,7 @@
 - [用户注册](#用户注册)
 - [用户登录](#用户登录)
 - [获取所有用户](#获取所有用户)
+- [删除用户](#删除用户)
 
 ---
 
@@ -223,6 +224,73 @@
 - `list[dict[str, object]]`: 用户列表
   - 成功时返回: `[{"userId": "...", "username": "...", "password": "...", "roles": [...], ...}, ...]`
   - 失败时返回: 空列表 `[]`
+
+---
+
+## 删除用户
+
+删除指定的用户账户。
+
+### API信息
+- **Endpoint**: `/api/v1/adminuserservice/users/{userId}` (ts-admin-user-service)
+- **Method**: `DELETE`
+- **Description**: 删除指定用户账户
+- **认证**: 需要，需要在header中带上token，比如`{"Authorization": f"Bearer {token}"}`
+
+### 请求参数
+
+**路径参数**:
+- `userId` (string, 必填): 用户ID，系统内部的UUID格式标识符（例如：`ed5c5491-c4e1-431d-bc14-cff9e04c9d75`）
+
+**重要说明**:
+- `userId` **不是** `userName`（用户名），而是系统内部生成的一串UUID格式的唯一标识符
+- 要删除用户，必须先获取该用户的 `userId`，常见方式包括：
+  1. **从注册响应中获取**：注册用户时，响应中的 `data.userId` 字段包含新创建用户的ID
+  2. **从登录响应中获取**：登录成功后，响应中的 `data.userId` 字段包含当前登录用户的ID
+  3. **从用户列表查询**：调用"获取所有用户"接口，从返回的用户列表中找到目标用户的 `userId`
+  4. **通过用户名查询**：如果有按用户名查询用户的接口，可以从查询结果中获取 `userId`
+
+### 响应格式
+
+成功响应：
+```json
+{
+  "status": 1,
+  "msg": "DELETE SUCCESS",
+  "data": null
+}
+```
+
+失败响应：
+```json
+{
+  "status": 0,
+  "msg": "Error message",
+  "data": null
+}
+```
+
+### Action方法
+
+**方法名**: `delete_user()`
+
+**入参**:
+- `user_id` (str): 用户ID（UUID格式），不是用户名
+- `token` (str): 认证token（需要先通过login方法获取）
+
+**返回值**:
+- `dict[str, object]`: 删除响应数据
+  - 成功时返回: `{"status": 1, "msg": "DELETE SUCCESS", "data": null}`
+  - 失败时返回: `{"status": 0, "msg": "Error message", "data": null}` 或空字典 `{}`
+
+### 注意事项
+
+- 删除接口需要先登录获取token，然后在请求头中添加：`Authorization: Bearer {token}`
+- **重要**：`userId` 是系统内部的UUID标识符，不是 `userName`（用户名）
+- 删除操作不可逆，请谨慎使用
+- 通常需要管理员权限才能删除用户
+- 如果用户不存在或已被删除，可能会返回错误信息
+
 
 ---
 
