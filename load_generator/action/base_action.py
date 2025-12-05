@@ -45,7 +45,7 @@ class BaseAction:
         else:
             return {"status_code": response.status_code, "message": response.text}
     
-    def _get(self, endpoint: str, params: dict[str, object] | None = None, name: str | None = None) -> list[dict[str, object]] | dict[str, object]:
+    def _get(self, endpoint: str, params: dict[str, object] | None = None, name: str | None = None, headers: dict[str, str] | None = None) -> list[dict[str, object]] | dict[str, object]:
         """
         发送GET请求的通用方法
         
@@ -53,6 +53,7 @@ class BaseAction:
             endpoint: API端点路径
             params: URL参数
             name: Locust统计中的名称（如果为None，使用endpoint）
+            headers: 请求头（可选，用于认证等）
             
         Returns:
             响应JSON数据（可能是字典或列表）
@@ -60,7 +61,8 @@ class BaseAction:
         response = self.client.get(
             endpoint,
             params=params,
-            name=name or endpoint
+            name=name or endpoint,
+            headers=headers
         )
         
         if response.status_code == 200:
