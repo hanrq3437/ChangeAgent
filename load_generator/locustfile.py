@@ -3,7 +3,7 @@ Locust负载测试文件 - TrainTicket系统负载生成器
 """
 import logging
 from locust import HttpUser, task, between
-from flow import SimpleQueryFlow, SimpleLoginFlow
+from flow import SimpleQueryFlow, SimpleLoginFlow, BookingFlow
 
 # 配置日志
 logging.basicConfig(
@@ -55,6 +55,21 @@ class TrainTicketUser(HttpUser):
             logger.info("简单登录流程完成")
         else:
             logger.warning(f"简单登录流程失败: {result.get('error')}")
+    
+    @task(2)
+    def booking_flow(self):
+        """
+        执行订票流程（查票 -> 登录 -> 获取联系人 -> 订票）
+        权重为2，模拟完整的购票场景
+        Flow内部会自动生成起点、终点、日期和用户凭据
+        """
+        flow = BookingFlow(self.client)
+        result = flow.execute()
+        
+        if result["success"]:
+            logger.info(f"订票流程完成，车次: {result.get('trip_id')}")
+        else:
+            logger.warning(f"订票流程失败: {result.get('error')}")
 
 
 """
@@ -63,9 +78,9 @@ class TrainTicketUser(HttpUser):
 无头模式运行（快速测试）：
    locust -f locustfile.py --host=http://10.10.1.98:32677 --headless -u 10 -r 3 -t 30s
    参数说明：
-   -u 100: 100个并发用户
-   -r 10: 每秒启动10个用户（ramp-up rate）
-   -t 60s: 运行60秒
+   -u 10: 10个并发用户
+   -r 3: 每秒启动3个用户（ramp-up rate）
+   -t 30s: 运行30秒
 
 保存测试结果到CSV：
    locust -f locustfile.py --host=http://10.10.1.98:32677 --headless -u 100 -r 10 -t 60s --csv=results

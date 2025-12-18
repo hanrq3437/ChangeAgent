@@ -4,6 +4,9 @@
 import random
 from datetime import datetime, timedelta
 import config
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def get_random_station(exclude: list[str] = []) -> str:
@@ -47,6 +50,40 @@ def get_random_end_station(start_station: str | None = None) -> str:
     return get_random_station(exclude)
 
 
+def get_random_end_station_by_route(start_station: str) -> str | None:
+    """
+    根据config中的路线信息，随机选择一个存在的终点站
+    
+    优先从高铁/动车路线中选择，如果没有则从普通火车路线中选择
+    如果两种路线都没有，则返回None
+    
+    Args:
+        start_station: 起点站名称
+    
+    Returns:
+        随机选择的终点站名称，如果不存在路线则返回None
+    """
+    available_ends = []
+    
+    # 先从高铁/动车路线中查找
+    if start_station in config.ROUTES_HIGH_SPEED:
+        high_speed_ends = [end for end, exists in config.ROUTES_HIGH_SPEED[start_station].items() if exists]
+        available_ends.extend(high_speed_ends)
+    
+    # 再从普通火车路线中查找
+    if start_station in config.ROUTES_NORMAL:
+        normal_ends = [end for end, exists in config.ROUTES_NORMAL[start_station].items() if exists]
+        available_ends.extend(normal_ends)
+    
+    # 去重
+    available_ends = list(set(available_ends))
+    
+    if not available_ends:
+        return None
+    
+    return random.choice(available_ends)
+
+
 def get_future_date(days_ahead: int | None = None, max_days: int = 30) -> str:
     """
     生成一个未来的日期字符串
@@ -87,7 +124,7 @@ def get_random_user() -> dict[str, str]:
     """
     if not config.DEFAULT_USERS:
         # 如果没有配置用户，返回默认值
-        return {"username": "fdse_microservices", "password": "111111"}
+        return {"username": "fdse_microservice", "password": "111111"}
     return random.choice(config.DEFAULT_USERS)
 
 
@@ -180,4 +217,37 @@ def generate_register_data(user_name: str | None = None, password: str | None = 
         "document_num": document_num,
         "email": email
     }
+
+
+def select_random_trip(trips: list[dict[str, object]]) -> str | None:
+    """
+    从车次列表中随机选择一个车次，返回车次ID字符串
+    
+    Args:
+        trips: 车次列表，每个车次是一个字典，包含 tripId 等信息
+        
+    Returns:
+        车次ID字符串（如 "G1234" 或 "Z1234"），如果列表为空则返回None
+    """
+    if not trips:
+        logger.warning("车次列表为空，无法选择车次")
+        return None
+    
+    # 随机选择一个车次
+    selected_trip = random.choice(trips)
+    
+    # 提取 tripId 并构建 trip_id_str
+    trip_id = selected_trip.get("tripId", {})
+    if isinstance(trip_id, dict):
+        trip_type = trip_id.get("type", "")
+        trip_number = trip_id.get("number", "")
+        trip_id_str = f"{trip_type}{trip_number}"
+    else:
+        trip_id_str = str(trip_id)
+    
+    # 判断是否是高铁/动车：G或D开头
+    is_high_speed = trip_id_str.startswith("G") or trip_id_str.startswith("D")
+    logger.info(f"随机选择车次: {trip_id_str}, 类型: {'高铁/动车' if is_high_speed else '普通火车'}")
+    
+    return trip_id_str
 

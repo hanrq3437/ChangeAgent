@@ -77,7 +77,7 @@ BASE_URL = os.getenv("TRAINTICKET_BASE_URL", "http://localhost:8080")
 
 # 默认测试用户
 DEFAULT_USERS = [
-    {"username": "fdse_microservices", "password": "111111"},
+    {"username": "fdse_microservice", "password": "111111"},
 ]
 ```
 

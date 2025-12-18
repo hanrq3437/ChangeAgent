@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class SimpleQueryFlow(BaseFlow):
-    """简单查询流程 - 只执行查票操作"""
+    """简单查询流程 - 只执行查票操作，不保证有票，所以很有可能查不到对应的车次"""
     
     def execute(self, start: str | None = None, end: str | None = None, 
                 date: str | None = None) -> dict[str, object]:

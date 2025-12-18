@@ -26,6 +26,8 @@ class TravelAction(BaseAction):
             "endPlace": end_place,
             "departureTime": departure_time
         }
+
+        # 需要注意，日期必须晚于当前日期，否则就会查不到剩余车票
         
         result = self._post("/api/v1/travelservice/trips/left", data)
         
